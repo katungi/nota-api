@@ -2,19 +2,20 @@ import express, {Express, Request, Response} from 'express';
 import bodyParser from 'body-parser';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import {PORT} from './config';
+import App from './config/app';
+import dbConnection from './www';
+import * as mongoose from "mongoose";
 
 dotenv.config();
 
-const PORT = process.env.port || 3000;
-
-const app: Express = express();
-
-app.use(helmet());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-app.get('/', (req: Request, res: Response)=> {
-    res.send('<h1>Hello from the TypeScript world!</h1>');
-});
-
-app.listen(PORT, ()=> console.log(`Running on ${PORT} ⚡`));
+const startServer = async () => {
+    const app: Express = express();
+    // setup app configs
+    await App(app);
+    // setup db
+    await dbConnection();
+    // run the server !
+    app.listen(PORT, ()=> console.log(`Running on ${PORT} ⚡`));
+}
+startServer();
